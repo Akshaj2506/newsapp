@@ -140,9 +140,9 @@ export class News extends Component {
       },
       "author": "The Associated Press",
       "title": "Deadly wildfires in Greece and other European countries destroy homes and threaten nature reserves - The Associated Press",
-      "description": null,
+      "description": "Deadly fires raging in Greece and other European countries advanced on Wednesday, destroying homes and threatening nature reserves during a third successive wave of extreme temperatures. The summer wildfires have struck countries across the region, prompting the European Union to expand its support, sending two Spanish firefighting planes to Tunisia after wildfires in neighboring Algeria left at least 34 people dead in recent days.",
       "url": "https://news.google.com/rss/articles/CBMic2h0dHBzOi8vYXBuZXdzLmNvbS9hcnRpY2xlL3dpbGRmaXJlcy1ncmVlY2UtaXRhbHktcG9ydHVnYWwtY3JvYXRpYS10dXJrZXktaGVhdHdhdmUtMTc2ZDkzNzJkODdiMmY2YTM4ZjU2NzIyZDNkYzFiZjLSAQA?oc=5",
-      "urlToImage": null,
+      "urlToImage": "",
       "publishedAt": "2023-07-27T03:31:00Z",
       "content": null
     },
@@ -267,8 +267,8 @@ export class News extends Component {
   constructor() {
     super();
     this.state = {
-      articles : this.articles,
-      loading : false
+      articles: this.articles,
+      loading: false
     }
   }
   render() {
@@ -276,26 +276,14 @@ export class News extends Component {
       <div className='container my-3'>
         <h2>Top headlines of the week</h2>
         <div className="row">
-          <div className="col-md-4">
-            <NewsItem title="myTitle1" description="myDesc1" />
-          </div>
-          <div className="col-md-4">
-            <NewsItem title="myTitle1" description="myDesc1" />
-          </div>
-          <div className="col-md-4">
-            <NewsItem title="myTitle1" description="myDesc1" />
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-4">
-            <NewsItem title="myTitle1" description="myDesc1" />
-          </div>
-          <div className="col-md-4">
-            <NewsItem title="myTitle1" description="myDesc1" />
-          </div>
-          <div className="col-md-4">
-            <NewsItem title="myTitle1" description="myDesc1" />
-          </div>
+          {this.state.articles.map((newsElement) => {
+            let {url, title, description, urlToImage} = newsElement;
+            return (
+              <div className="col-md-4 my-2" key={url}>
+                <NewsItem title={title.slice(0, 70)} description={description.slice(0, 80)} newsUrl={url} imgUrl={urlToImage}/>
+              </div>
+            )
+          })}
         </div>
       </div>
     )
