@@ -4,7 +4,7 @@ export class Loading extends Component {
   render() {
     return (
       <div style={{height : "200px"}} className='text-center'>
-         <img src={loadingImg} alt="" />
+         <img src={loadingImg} alt="" height="50"/>
       </div>
     )
   }
