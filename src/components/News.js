@@ -23,44 +23,33 @@ export class News extends Component {
     topic: PropTypes.string,
     pageSize: PropTypes.number
   }
-  async componentDidMount() {
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.topic}&apiKey=b2c1db18082d4e2e92471dfd2d5fca3d&pageSize=${this.props.pageSize}&page=1`;
+  async handleNewsAPI(isNext = null) {
+    let url;
+    if (isNext === null) {
+      url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.topic}&apiKey=b2c1db18082d4e2e92471dfd2d5fca3d&pageSize=${this.props.pageSize}&page=1`;
+    }
+    else {
+      url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.topic}&apiKey=b2c1db18082d4e2e92471dfd2d5fca3d&pageSize=${this.props.pageSize}&page=${(isNext === true) ? this.state.page + 1 : this.state.page - 1}`
+    }
     this.setState({ loading: true });
     let data = await fetch(url);
     let parsedData = await data.json();
-    this.setState({
-      articles: parsedData.articles,
-      totalResults: parsedData.totalResults,
-      loading: false
-    })
+    if (isNext === null) {
+      this.setState({
+        articles: parsedData.articles,
+        totalResults: parsedData.totalResults,
+        loading: false
+      })      
+    } else {
+      this.setState({
+        articles: parsedData.articles,
+        page: (isNext === true) ? this.state.page + 1 : this.state.page - 1,
+        loading: false
+      })
+    }
   }
-  handlePrevClick = async () => {
-    console.log("Previous clicked");
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.topic}&apiKey=b2c1db18082d4e2e92471dfd2d5fca3d&pageSize=${this.props.pageSize}&page=${this.state.page - 1}`;
-    this.setState({
-      loading: true
-    })
-    let data = await fetch(url);
-    let parsedData = await data.json();
-    this.setState({
-      articles: parsedData.articles,
-      page: this.state.page - 1,
-      loading: false
-    })
-  }
-  handleNextClick = async () => {
-    console.log("Next clicked");
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.topic}&apiKey=b2c1db18082d4e2e92471dfd2d5fca3d&pageSize=${this.props.pageSize}&page=${this.state.page + 1}`;
-    this.setState({
-      loading: true
-    })
-    let data = await fetch(url);
-    let parsedData = await data.json();
-    this.setState({
-      articles: parsedData.articles,
-      page: this.state.page + 1,
-      loading: false
-    })
+  async componentDidMount() {
+    this.handleNewsAPI();    
   }
   render() {
     return (
@@ -86,8 +75,8 @@ export class News extends Component {
           })}
         </div>
         <div className="container d-flex justify-content-between">
-          <button className='btn btn-light' disabled={this.state.page <= 1} onClick={this.handlePrevClick}>&larr; Previous</button>
-          <button className='btn btn-light' disabled={(this.state.totalResults - (this.state.page * this.props.pageSize)) > 0 ? false : true} onClick={this.handleNextClick}>Next &rarr;</button>
+          <button className='btn btn-light' disabled={this.state.page <= 1} onClick={() => {this.handleNewsAPI(false)}}>&larr; Previous</button>
+          <button className='btn btn-light' disabled={(this.state.totalResults - (this.state.page * this.props.pageSize)) > 0 ? false : true} onClick={() => { this.handleNewsAPI(true) }}>Next &rarr;</button>
         </div>
       </div>
     )
