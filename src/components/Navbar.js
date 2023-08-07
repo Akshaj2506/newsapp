@@ -30,7 +30,7 @@ export class Navbar extends Component {
                      </li>
                   </div>
                </div>
-            </div>
+            </div> 
          </nav>
       )
    }

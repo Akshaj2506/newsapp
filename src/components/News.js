@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import NewsItem from './NewsItem'
 import Loading from './Loading';
 import PropTypes from 'prop-types'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 export class News extends Component {
   constructor() {
@@ -39,7 +40,7 @@ export class News extends Component {
         articles: parsedData.articles,
         totalResults: parsedData.totalResults,
         loading: false
-      })      
+      })
     } else {
       this.setState({
         articles: parsedData.articles,
@@ -48,37 +49,58 @@ export class News extends Component {
       })
     }
   }
+  fetchNextData = async () => {
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.topic}&apiKey=b2c1db18082d4e2e92471dfd2d5fca3d&pageSize=${this.props.pageSize}&page=${this.state.page}`
+    let data = await fetch(url);
+    let parsedData = await data.json();
+    this.setState({
+      articles: this.state.articles.concat(parsedData.articles),
+      totalResults: parsedData.totalResults,
+      loading: false,
+      page: this.state.page + 1
+    })
+    console.log(parsedData.articles)
+  }
   async componentDidMount() {
-    this.handleNewsAPI();    
+    await this.fetchNextData();
   }
   render() {
     return (
-      <div className='container my-3'>
+      <>
         <h1>Top headlines of the week</h1>
-        <div className="row">
-          {this.state.loading && <Loading />}
-          {!this.state.loading && this.state.articles.map((newsElement) => {
-            let { url, title, description, urlToImage, publishedAt, source, author } = newsElement;
-            return (
+        <InfiniteScroll
+          dataLength={this.state.articles.length} //This is important field to render the next data
+          next={this.fetchNextData}
+          hasMore={this.state.articles.length !== this.state.totalResults}
+          loader={<Loading />}
+        >
+          <div className="container">
+            <div className="row">
+              {this.state.loading && <Loading />}
+              {this.state.articles.map((newsElement) => {
+                let {url, title, description, urlToImage, publishedAt, source, author} = newsElement;
+              return (
               <div className="col-md-4 my-3" key={url}>
                 <NewsItem
                   title={title ? title.slice(0, 70) : ""}
                   description={description ? description.slice(0, 80) : ""}
                   newsUrl={url}
                   imgUrl={urlToImage ? urlToImage : "https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg"}
-                  publishTime = {new Date(publishedAt).toUTCString()}
+                  publishTime={new Date(publishedAt).toUTCString()}
                   source={source}
-                  author = {author}
+                  author={author}
                 />
               </div>
-            )
-          })}
-        </div>
-        <div className="container d-flex justify-content-between">
-          <button className='btn btn-light' disabled={this.state.page <= 1} onClick={() => {this.handleNewsAPI(false)}}>&larr; Previous</button>
-          <button className='btn btn-light' disabled={(this.state.totalResults - (this.state.page * this.props.pageSize)) > 0 ? false : true} onClick={() => { this.handleNewsAPI(true) }}>Next &rarr;</button>
-        </div>
-      </div>
+              )
+              })}
+            </div>
+          </div>
+          {/* <div className="container d-flex justify-content-between">
+            <button className='btn btn-light' disabled={this.state.page <= 1} onClick={() => {this.handleNewsAPI(false)}}>&larr; Previous</button>
+            <button className='btn btn-light' disabled={(this.state.totalResults - (this.state.page * this.props.pageSize)) > 0 ? false : true} onClick={() => { this.handleNewsAPI(true) }}>Next &rarr;</button>
+          </div> */}
+        </InfiniteScroll >
+      </>
     )
   }
 }
