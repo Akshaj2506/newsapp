@@ -9,7 +9,11 @@ const News = (props) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(1);
-
+  const useNavButtons = false;
+  const capitalizeFirstLetter = (phrase) => {
+    return phrase.slice(0,1).toUpperCase() + phrase.slice(1, phrase.length); 
+  }
+  document.title = `NewsMonkey - ${capitalizeFirstLetter(props.topic)}`
   const handleNewsAPI = async (isNext = null) => {
     let url;
     if (isNext === null) {
@@ -46,10 +50,11 @@ const News = (props) => {
   }
   useEffect(() => {
     fetchNextData();
+    // eslint-disable-next-line
   }, [])
   return (
     <>
-      <h1>Top headlines of the week</h1>
+      <h1 className='text-center' style={{marginTop : "80px"}}>Top Headlines - {capitalizeFirstLetter(props.topic)}</h1>
       <InfiniteScroll
         dataLength={articles.length} //This is important field to render the next data
         next={fetchNextData}
@@ -77,10 +82,10 @@ const News = (props) => {
             })}
           </div>
         </div>
-        {/* <div className="container d-flex justify-content-between">
-            <button className='btn btn-light' disabled={this.state.page <= 1} onClick={() => {this.handleNewsAPI(false)}}>&larr; Previous</button>
-            <button className='btn btn-light' disabled={(this.state.totalResults - (this.state.page * this.props.pageSize)) > 0 ? false : true} onClick={() => { this.handleNewsAPI(true) }}>Next &rarr;</button>
-          </div> */}
+        <div className="container d-flex justify-content-between my-4">
+          <button className='btn btn-light' disabled={(useNavButtons) ? this.state.page <= 1 : true} onClick={() => { handleNewsAPI(false) }}>&larr; Previous</button>
+          <button className='btn btn-light' disabled={(useNavButtons) ? ((this.state.totalResults - (this.state.page * this.props.pageSize)) > 0 ? false : true) : true} onClick={() => { handleNewsAPI(true) }}>Next &rarr;</button>
+        </div>
       </InfiniteScroll >
     </>
   )
